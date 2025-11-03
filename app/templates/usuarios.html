@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuários Cadastrados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <main class="container mt-4">
+        <header class="mb-4">
+            <h1 class="h3">Usuários Cadastrados</h1>
+        </header>
+
+        {% if usuarios %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle" aria-label="Tabela de usuários cadastrados">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">E-mail</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.id }}</td>
+                            <td>{{ usuario.nome }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>
+                                <a href="/editar/{{ usuario.id }}" class="btn btn-sm btn-warning" aria-label="Editar usuário {{ usuario.nome }}">Editar</a>
+                                <a href="/deletar/{{ usuario.id }}" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Tem certeza que deseja excluir?')"
+                                   aria-label="Excluir usuário {{ usuario.nome }}">Excluir</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">Nenhum usuário cadastrado.</p>
+        {% endif %}
+
+        <div class="mt-3">
+            <a href="/" class="btn btn-link" aria-label="Voltar para a página inicial">← Voltar para o início</a>
+        </div>
+    </main>
+
+    <!-- 🔍 Botões de Acessibilidade -->
+    <div class="fixed-bottom p-3 bg-white border-top text-end shadow">
+        <button class="btn btn-sm btn-secondary me-2" onclick="document.body.style.zoom='110%'" aria-label="Aumentar fonte">A+</button>
+        <button class="btn btn-sm btn-secondary me-2" onclick="document.body.style.zoom='100%'" aria-label="Fonte normal">A</button>
+        <button class="btn btn-sm btn-secondary" onclick="document.body.style.zoom='90%'" aria-label="Diminuir fonte">A-</button>
+    </div>
+</body>
+</html>
