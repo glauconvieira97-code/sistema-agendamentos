@@ -8,8 +8,9 @@ from app.database import SessionLocal
 from app.models import Usuario, Agendamento
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
 
+# 🔧 CORRIGIDO: caminho ajustado para o diretório correto
+templates = Jinja2Templates(directory="templates")
 
 # ==============================
 # 🔹 Função para obter sessão do banco
@@ -21,13 +22,11 @@ def get_db():
     finally:
         db.close()
 
-
 # ==============================
 # 🔹 Função auxiliar para verificar login
 # ==============================
 def verificar_login(request: Request):
     return request.session.get("usuario_id") is not None
-
 
 # ==============================
 # 🏠 PÁGINA INICIAL
@@ -36,12 +35,10 @@ def verificar_login(request: Request):
 async def homepage(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-
 # ==============================
 # 👤 USUÁRIOS
 # ==============================
 
-# Cadastrar novo usuário
 @router.post("/cadastrar")
 async def cadastrar_usuario(
     nome: str = Form(...),
@@ -54,22 +51,16 @@ async def cadastrar_usuario(
     db.commit()
     return RedirectResponse(url="/", status_code=303)
 
-
-# Listar usuários
 @router.get("/usuarios", response_class=HTMLResponse)
 def listar_usuarios(request: Request, db: Session = Depends(get_db)):
     usuarios = db.query(Usuario).all()
     return templates.TemplateResponse("usuarios.html", {"request": request, "usuarios": usuarios})
 
-
-# Formulário para editar usuário
 @router.get("/editar/{usuario_id}", response_class=HTMLResponse)
 def editar_usuario_form(usuario_id: int, request: Request, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     return templates.TemplateResponse("editar.html", {"request": request, "usuario": usuario})
 
-
-# Salvar edição de usuário
 @router.post("/editar/{usuario_id}")
 def salvar_edicao(
     usuario_id: int,
@@ -86,8 +77,6 @@ def salvar_edicao(
         db.commit()
     return RedirectResponse("/usuarios", status_code=303)
 
-
-# Excluir usuário
 @router.get("/deletar/{usuario_id}")
 def deletar_usuario(usuario_id: int, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
@@ -96,12 +85,10 @@ def deletar_usuario(usuario_id: int, db: Session = Depends(get_db)):
         db.commit()
     return RedirectResponse("/usuarios", status_code=303)
 
-
 # ==============================
 # 📅 AGENDAMENTOS
 # ==============================
 
-# Exibir formulário de agendamento
 @router.get("/agendar", response_class=HTMLResponse)
 def form_agendamento(request: Request, db: Session = Depends(get_db)):
     if not verificar_login(request):
@@ -114,8 +101,6 @@ def form_agendamento(request: Request, db: Session = Depends(get_db)):
         "usuario_nome": request.session.get("usuario_nome")
     })
 
-
-# Criar agendamento
 @router.post("/agendar")
 def criar_agendamento(
     request: Request,
@@ -137,8 +122,6 @@ def criar_agendamento(
     db.commit()
     return RedirectResponse("/agendamentos", status_code=303)
 
-
-# Listar agendamentos
 @router.get("/agendamentos", response_class=HTMLResponse)
 def listar_agendamentos(request: Request, db: Session = Depends(get_db)):
     if not verificar_login(request):
@@ -151,8 +134,6 @@ def listar_agendamentos(request: Request, db: Session = Depends(get_db)):
         "usuario_nome": request.session.get("usuario_nome")
     })
 
-
-# Editar agendamento (formulário)
 @router.get("/editar_agendamento/{agendamento_id}", response_class=HTMLResponse)
 def editar_agendamento_form(agendamento_id: int, request: Request, db: Session = Depends(get_db)):
     if not verificar_login(request):
@@ -167,8 +148,6 @@ def editar_agendamento_form(agendamento_id: int, request: Request, db: Session =
         "usuario_nome": request.session.get("usuario_nome")
     })
 
-
-# Salvar agendamento editado
 @router.post("/editar_agendamento/{agendamento_id}")
 def salvar_agendamento_editado(
     agendamento_id: int,
@@ -185,8 +164,6 @@ def salvar_agendamento_editado(
         db.commit()
     return RedirectResponse("/agendamentos", status_code=303)
 
-
-# Excluir agendamento
 @router.get("/deletar_agendamento/{agendamento_id}")
 def deletar_agendamento(agendamento_id: int, db: Session = Depends(get_db)):
     agendamento = db.query(Agendamento).filter(Agendamento.id == agendamento_id).first()
@@ -195,7 +172,6 @@ def deletar_agendamento(agendamento_id: int, db: Session = Depends(get_db)):
         db.commit()
     return RedirectResponse("/agendamentos", status_code=303)
 
-
 # ==============================
 # 🔐 LOGIN E LOGOUT
 # ==============================
@@ -203,7 +179,6 @@ def deletar_agendamento(agendamento_id: int, db: Session = Depends(get_db)):
 @router.get("/login", response_class=HTMLResponse)
 def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
-
 
 @router.post("/login")
 def login(
@@ -224,7 +199,6 @@ def login(
         "request": request,
         "erro": "E-mail ou senha incorretos"
     })
-
 
 @router.get("/logout")
 def logout(request: Request):
